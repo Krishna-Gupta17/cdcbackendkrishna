@@ -19,6 +19,7 @@ const port = process.env.PORT || 4200;
 
 const allowedOrigins = [
   'https://cdcfrontendkrishna.vercel.app', 
+  'http://localhost:5173'
 ];
 
 app.use(cors({

@@ -151,9 +151,10 @@ export const userDashboard = async (req, res) => {
 export const userProfile = async (req, res) => {
 	try {
 		const firebaseUID = req.user.firebaseUid;
-
+      console.log(firebaseUID);
 		const profile = await User.findOne({ firebaseUID }).select('-password');
 		if (!profile) {
+			console.log("profile not found")
 			return res.status(404).json({ message: 'error getting user data' });
 		}
 		const { firstName, lastName, email, phone, college, rollno, teamname ,role} = profile;

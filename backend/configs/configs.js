@@ -68,9 +68,7 @@ try {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
   if (!admin.apps.length) { 
-    const serviceAccount = JSON.parse(
-      readFileSync(join(__dirname, "firebaseServiceAccountKey.json"))
-    );
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
