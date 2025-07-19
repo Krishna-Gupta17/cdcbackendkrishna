@@ -18,8 +18,7 @@ const app = express();
 const port = process.env.PORT || 4200;
 
 const allowedOrigins = [
-  'https://cdcfrontendkrishna.vercel.app', 
-  'http://localhost:5173'
+  'http://localhost:5173', 
 ];
 
 app.use(cors({
@@ -60,7 +59,7 @@ app.use('/firebase-auth', firebaseAuthRouter);
 //app.use('/resource',resourceRouter);
 //app.use('/team',teamRouter);
 app.use('/admin',adminRoutes);
-app.use('/team',teamRouter);
+app.use('/api',teamRouter);
 
 //listens to port for req 
 app.listen(port, () => {

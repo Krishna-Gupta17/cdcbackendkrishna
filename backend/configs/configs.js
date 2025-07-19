@@ -4,11 +4,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import {v2 as cloudinary} from "cloudinary"
 import multer from "multer";
-import admin from "firebase-admin";
-import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-
+// firebaseAdmin.js
+import { initializeApp, cert, getApps } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 dotenv.config();
 //---------------------MONGODB--------------------------
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
@@ -65,21 +65,28 @@ export const uploadToCloudinary = async (fileData, options = {}) => {
 //-------------------------FIREBASE----------------------
 let auth = null;
 try {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  if (!admin.apps.length) { 
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
 
-    console.log("Firebase Admin SDK initialized successfully !!");
-  } else {
-    console.log("Firebase Admin SDK already initialized !!");
-  }
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-  auth = admin.auth();
+let adminApp;
+
+if (!getApps().length) {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+
+  adminApp = initializeApp({
+    credential: cert(serviceAccount),
+  });
+
+  console.log("Firebase Admin SDK initialized successfully !!");
+} else {
+  console.log("Firebase Admin SDK already initialized !!");
+  adminApp = getApps()[0]; // use existing app
+}
+  auth = getAuth(adminApp);
+
 } catch (error) {
   console.error("Failed to initialize Firebase Admin SDK !! :", error.message);
 }
