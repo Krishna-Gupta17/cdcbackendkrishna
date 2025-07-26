@@ -10,8 +10,13 @@ export const registerWithFirebase = async (req, res) => {
   try {
     const decoded = await auth.verifyIdToken(firebaseToken);
     const { email, uid } = decoded;
+    console.log("Decoded Firebase token:", decoded);
+
+    if (!email) return res.status(400).json({ message: "Email not found in token" });
 
     let user = await User.findOne({ email });
+    console.log("User already in DB:", user);
+
     const memberEmail = email;
     let member = await Member.findOne({ memberEmail })
     const role = (member) ? "member" : "user";
