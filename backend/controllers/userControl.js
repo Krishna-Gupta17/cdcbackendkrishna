@@ -191,12 +191,15 @@ export const updateProfile = async (req, res) => {
 		}
 
 		const allowedUpdates = ['phone', 'college', 'rollno'];
-		allowedUpdates.forEach(field => {
-			if (req.body[field] !== undefined) {
+		const updates = Object.keys(req.body);
+
+		updates.forEach((field) => {
+			if (allowedUpdates.includes(field)) {
 				user[field] = req.body[field];
 			}
 		});
 
+		console.log('Updating user profile:', user);
 		user.updatedAt = new Date();
 		await user.save();
 
