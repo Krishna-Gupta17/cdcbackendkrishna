@@ -39,7 +39,7 @@ export const getUserPofile = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.userId);
+    await User.findByIdAndDelete(req.params.userID);
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Error deleting user', error: err.message });
@@ -188,5 +188,21 @@ export const addmember = async (req, res) => {
   } catch (error) {
     console.error('Create member error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+export const deleteMember = async (req, res) => {
+  try {
+    const { memberID } = req.params;
+    const member = await Member.findByIdAndDelete(memberID);
+
+    
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Member not found' });
+    }
+
+    res.status(200).json({ success: true, message: 'Member deleted successfully' });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
   }
 };
