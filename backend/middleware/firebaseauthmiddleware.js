@@ -23,7 +23,8 @@ export const protect = async (req, res, next) => {
       role: user.role,
       eventProfile: user.eventProfile || {},
       firebaseUid: decodedToken.uid,
-      role:user.role
+      role:user.role,
+      email:user.email
     };
     next();
 

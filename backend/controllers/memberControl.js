@@ -3,6 +3,8 @@ import { Member } from "../models/member.js";
 import { uploadToCloudinary } from "../configs/configs.js";
 import { User } from "../models/user.js";
 
+
+
 export const listMembers = async (req, res) => {
   try {
     const { year } = req.query;
@@ -22,6 +24,7 @@ export const listMembers = async (req, res) => {
     });
   }
 };
+
 
 export const updateMember = async (req, res) => {
   try {
@@ -108,7 +111,15 @@ export const getMember = async (req, res) => {
 };
 
 export const createBlog = async (req, res) => {
-
+  const email = req.user.email;
+  const memberemail = req.body.email;
+  console.log(email,memberemail)
+  if (memberemail !== email) {
+    return res.status(403).json({
+      success: false,
+      message: "Not your profile bro",
+    });
+  }
   const { title, content, description, } = req.body
   try {
 
@@ -159,8 +170,6 @@ export const getMemberBlogs = async (req, res) => {
     else if (userid === memberid) {
       const blogs = await Blog.find({ author: memberid }).sort({ publishedAt: -1 });
     }
-
-
     res.json({
       success: true,
       data: blogs

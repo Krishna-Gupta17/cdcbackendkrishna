@@ -25,7 +25,7 @@ router.put('/:id', upload.single('memberImage'), updateMember);
 router.get('/blog/:id', getBlog);
 
 // Create blog (protected)
-router.post('/:id', upload.single('image'), createBlog);
+router.post('/:id', protect,upload.single('image'), createBlog);
 
 // Update blog (protected, ownership)
 router.put('/:id/:blogID', protect, blogownership, updateBlog);
