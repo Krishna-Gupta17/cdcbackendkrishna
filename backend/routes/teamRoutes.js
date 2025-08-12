@@ -4,9 +4,32 @@ import mongoose from 'mongoose';
 import { Team } from '../models/team.js';
 import { User } from '../models/user.js';
 import { auth } from '../configs/configs.js'; // Firebase Admin init
-
+import { getTeamDetails } from "../controllers/teamController.js";
+import { protect } from '../middleware/firebaseauthmiddleware.js';
 const router = express.Router();
+//check
+router.get("/user/team-status", protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
 
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.teamId) {
+      return res.json({ hasTeam: true });
+    } else {
+      return res.json({ hasTeam: false });
+    }
+  } catch (err) {
+    console.error("Error checking team status:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// routes/teamRoutes.js
+router.get("/dashboard", getTeamDetails);
+//register routes
 router.post('/register', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ success: false, message: 'Unauthorized: No token' });
