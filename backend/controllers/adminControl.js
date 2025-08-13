@@ -153,37 +153,56 @@ export const updatePaymentStatus = async (req, res) => {
   }
 };
 
-export const addmember = async (req, res) => {
+export const addMember = async (req, res) => {
   try {
-    const member = req.body;
-
-    const foundone = await Member.findOne({
-      email: member.email,
-      memberName: member.memberName
-    });
-
-    if (foundone) {
+    const { memberName, memberEmail, memberRole, memberYear } = req.body;
+    if (!memberName || !memberEmail || !memberRole || !memberYear) {
       return res.status(400).json({
         success: false,
-        message: 'Member already exists'
+        message: 'All fields are required'
       });
     }
 
-    const newmember = new Member({
-      memberName: member.memberName,
-      memberEmail: member.memberEmail,
-      memberRole: member.memberRole,
-      memberYear: member.memberYear,
-
+    const member = await Member.create({
+      memberName,
+      memberEmail, 
+      memberRole, 
+      memberYear
     });
-
-    await newmember.save();
 
     res.status(201).json({
       success: true,
-      message: 'Member added successfully',
-      data: newmember
+      message: 'Member created successfully',
+      data: member
     });
+
+    // const foundone = await Member.findOne({
+    //   email: member.email,
+    //   memberName: member.memberName
+    // });
+
+    // if (foundone) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'Member already exists'
+    //   });
+    // }
+
+    // const newmember = new Member({
+    //   memberName: member.memberName,
+    //   memberEmail: member.memberEmail,
+    //   memberRole: member.memberRole,
+    //   memberYear: member.memberYear,
+
+    // });
+
+    // await newmember.save();
+
+    // res.status(201).json({
+    //   success: true,
+    //   message: 'Member added successfully',
+    //   data: newmember
+    // });
 
   } catch (error) {
     console.error('Create member error:', error);
@@ -196,7 +215,7 @@ export const deleteMember = async (req, res) => {
     const { memberID } = req.params;
     const member = await Member.findByIdAndDelete(memberID);
 
-    
+
     if (!member) {
       return res.status(404).json({ success: false, message: 'Member not found' });
     }

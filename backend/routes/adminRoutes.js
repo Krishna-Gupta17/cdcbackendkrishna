@@ -10,7 +10,7 @@ import {
     getTeam,
     updateTeam,
     deleteTeam,
-    addmember,
+    addMember,
     getAllMember,
     deleteMember
 } from "../controllers/adminControl.js"
@@ -48,7 +48,7 @@ router.delete('/teams/:teamID', authenticateUser, requireRole('admin'),deleteTea
 
 router.get('/members', getAllMember)
 
-router.post('/members', addmember)
+router.post('/members', authenticateUser, requireRole('admin'), addMember)
 
 router.delete('/members/:memberID', authenticateUser, requireRole('admin'), deleteMember);
 
