@@ -28,7 +28,7 @@ router.get("/user/team-status", protect, async (req, res) => {
 });
 
 // routes/teamRoutes.js
-router.get("/dashboard", getTeamDetails);
+router.get("/dashboard",protect, getTeamDetails);
 //register routes
 router.post('/register', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
