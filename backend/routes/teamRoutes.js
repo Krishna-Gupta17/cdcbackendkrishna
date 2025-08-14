@@ -8,6 +8,40 @@ import { getTeamDetails } from "../controllers/teamController.js";
 import { protect } from '../middleware/firebaseauthmiddleware.js';
 const router = express.Router();
 //check
+router.put("/member/update", protect, async (req, res) => {
+  try {
+    const { email, codeforcesId } = req.body;
+
+    // Logged-in user (editor) from protect middleware
+    const loggedInUserId = req.user.id;
+
+    // Find the team of the logged-in user
+    const team = await Team.findOne({ leaderId: loggedInUserId });
+    if (!team) {
+      return res.status(403).json({ message: "Only leader can edit the team" });
+    }
+
+    // Update member by email
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      { "eventProfile.codeforcesId": codeforcesId },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+
+    res.json({ message: "Member updated", user: updatedUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+
 router.get("/user/team-status", protect, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
