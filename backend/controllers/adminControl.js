@@ -1,12 +1,13 @@
 import { User } from '../models/user.js'
 import { Team } from '../models/team.js';
 import { Member } from '../models/member.js';
+import bcrypt from 'bcrypt';
+import admin from 'firebase-admin';
 
 
 export const getAllUser = async (req, res) => {
   try {
     const users = await User.find({ isActive: true })
-    console.log(users)
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching users', error: err.message });
@@ -16,7 +17,6 @@ export const getAllUser = async (req, res) => {
 export const getAllMember = async (req, res) => {
   try {
     const member = await Member.find()
-    console.log(member)
     res.status(200).json(member);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching members', error: err.message });
@@ -25,9 +25,7 @@ export const getAllMember = async (req, res) => {
 
 export const getUserPofile = async (req, res) => {
   try {
-    const userid = req.params.id;
-    const user = await User.findById(req.user.id).select('-password');
-
+    const user = await User.findById(req.params.userID).select('-password');
     res.status(200).json({
       success: true,
       user
@@ -46,27 +44,41 @@ export const deleteUser = async (req, res) => {
   }
 }
 
-
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password, role, college, universityRollNo } = req.body;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({
-      name,
+    const { firstName, lastName, email, password } = req.body;
+    const userRecord = await admin.auth().createUser({
       email,
-      phone,
-      password: hashedPassword,
-      role,
-      college,
-      universityRollNo,
+      password,
+      displayName: `${firstName} ${lastName}`,
     });
+
+    	console.log(userRecord)
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      firebaseUID: userRecord.uid, 
+      role: 'user'
+    });
+
+    console.log(newUser)
     await newUser.save();
-    res.status(201).json({ message: 'User created successfully', user: newUser });
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      firebaseUser: userRecord,
+      mongoUser: newUser
+    });
   } catch (err) {
-    res.status(400).json({ message: 'Error creating user', error: err.message });
+    res.status(400).json({
+      success: false,
+      message: 'Error creating user',
+      error: err.message
+    });
   }
 };
+
 
 export const updateUser = async (req, res) => {
   try {
@@ -86,7 +98,6 @@ export const updateUser = async (req, res) => {
 export const getAllTeams = async (req, res) => {
   try {
     const teams = await Team.find()
-    console.log(teams)
     res.status(200).json(teams);
   } catch (err) {
     res.status(500).json({
@@ -99,9 +110,7 @@ export const getAllTeams = async (req, res) => {
 
 export const getTeam = async (req, res) => {
   try {
-    const teamid = req.body.id;
-    const team = await Team.findById(teamid);
-
+    const team = await Team.findById(req.params.teamID);
     res.status(200).json({
       success: true,
       team
@@ -109,19 +118,37 @@ export const getTeam = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: 'Error fetching team',
-      error: err.message
+      error: error.message
     });
   }
 }
 
 export const updateTeam = async (req, res) => {
   try {
+    const flattenObject = (obj, parent = "", resObj = {}) => {
+      for (let key in obj) {
+        const propName = parent ? `${parent}.${key}` : key;
+        if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+          flattenObject(obj[key], propName, resObj);
+        } else {
+          resObj[propName] = obj[key];
+        }
+      }
+      return resObj;
+    };
+    
+    console.log(req.body)
+    const updateData = flattenObject(req.body);
+    console.log(updateData)
     const team = await Team.findByIdAndUpdate(
       req.params.teamID,
-      { $set: req.body },
+      { $set: updateData },
       { new: true, runValidators: true }
     );
-    if (!team) return res.status(404).json({ success: false, message: 'Team not found' });
+    console.log(team)
+    if (!team) {
+      return res.status(404).json({ success: false, message: "Team not found" });
+    }
     res.status(200).json({ success: true, team });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -196,7 +223,7 @@ export const deleteMember = async (req, res) => {
     const { memberID } = req.params;
     const member = await Member.findByIdAndDelete(memberID);
 
-    
+
     if (!member) {
       return res.status(404).json({ success: false, message: 'Member not found' });
     }

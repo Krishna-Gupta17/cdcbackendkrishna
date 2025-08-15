@@ -2,18 +2,20 @@ import express from 'express'
 import { authenticateUser, requireRole } from '../middleware/auth.js';
 import { protect } from '../middleware/firebaseauthmiddleware.js'
 import {
-    getAllTeams,
-    getAllUser,
-    createUser,
-    deleteUser,
-    getUserPofile,
-    getTeam,
-    updateTeam,
-    deleteTeam,
-    addmember,
-    getAllMember,
-    deleteMember
+  getAllTeams,
+  getAllUser,
+  createUser,
+  deleteUser,
+  getUserPofile,
+  getTeam,
+  updateTeam,
+  deleteTeam,
+  addmember,
+  getAllMember,
+  deleteMember,
+  updateUser
 } from "../controllers/adminControl.js"
+import { registerWithFirebase } from '../controllers/firebaseauthControl.js';
 
 const router = express.Router();
 
@@ -30,19 +32,21 @@ router.get('/', (req, res) => {
 
 router.get('/users', getAllUser);
 
-router.post('/users',protect, requireRole('admin'), createUser);
+router.get('/users/:userID', getUserPofile)
 
-router.put('/users/:userID', requireRole('admin'),getUserPofile);
+router.post('/users', protect, requireRole('admin'), createUser);
 
-router.delete('/users/:userID', authenticateUser, requireRole('admin'),deleteUser);
+router.put('/users/:userID',protect, requireRole('admin'), updateUser);
 
-router.get('/teams',getAllTeams)
+router.delete('/users/:userID', authenticateUser, requireRole('admin'), deleteUser);
 
-router.get('teams/:teamID', requireRole('admin'), getTeam);
+router.get('/teams', getAllTeams)
 
-router.put('/teams/:teamID',  requireRole('admin'),updateTeam);
+router.get('/teams/:teamID', getTeam);
 
-router.delete('/teams/:teamID', authenticateUser, requireRole('admin'),deleteTeam);
+router.put('/teams/:teamID', updateTeam);
+
+router.delete('/teams/:teamID', authenticateUser, requireRole('admin'), deleteTeam);
 
 //router.put('/teams/:teamID/payment', requireRole('admin'), updatePaymentStatus);
 

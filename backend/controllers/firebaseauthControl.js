@@ -29,7 +29,6 @@ export const registerWithFirebase = async (req, res) => {
         phone,
         college,
         rollno,
-        username: `${firstName} ${lastName}`,
         isActive: true,
         role
       });

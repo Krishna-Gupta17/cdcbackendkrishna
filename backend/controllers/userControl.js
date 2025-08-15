@@ -129,7 +129,7 @@ export const userDashboard = async (req, res) => {
 		if (!dashboard) {
 			return res.status(404).json({ message: 'error getting user data' });
 		}
-		const { firstName, lastName, email, phone, college, rollno, teamname } = dashboard;
+		const { firstName, lastName, email, phone, college, rollno} = dashboard;
 		res.json({
 			success: true,
 			user: {
@@ -138,7 +138,6 @@ export const userDashboard = async (req, res) => {
 				phone,
 				college,
 				rollno,
-				teamname,
 			}
 		});
 	} catch (error) {
@@ -150,14 +149,15 @@ export const userDashboard = async (req, res) => {
 //user profile
 export const userProfile = async (req, res) => {
 	try {
-		const firebaseUID = req.user.firebaseUid;
+	  const firebaseUID = req.user.firebaseUid;
       console.log(firebaseUID);
 		const profile = await User.findOne({ firebaseUID }).select('-password');
 		if (!profile) {
 			console.log("profile not found")
 			return res.status(404).json({ message: 'error getting user data' });
 		}
-		const { firstName, lastName, email, phone, college, rollno, teamname ,role} = profile;
+		console.log(profile)
+		const { firstName, lastName, email, phone, college, rollno ,role} = profile;
 		res.json({
 			success: true,
 			user: {
@@ -166,10 +166,8 @@ export const userProfile = async (req, res) => {
 				phone,
 				college,
 				rollno,
-				teamname,
 				role
-			}
-		});
+			}});
 	} catch (error) {
 		console.error('Error getting user data:', error);
 		res.status(400).json({ message: 'error getting user data' });
