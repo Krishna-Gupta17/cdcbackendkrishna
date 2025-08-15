@@ -2,18 +2,17 @@ import express from 'express'
 import { authenticateUser, requireRole } from '../middleware/auth.js';
 import { protect } from '../middleware/firebaseauthmiddleware.js'
 import {
-  getAllTeams,
-  getAllUser,
-  createUser,
-  deleteUser,
-  getUserPofile,
-  getTeam,
-  updateTeam,
-  deleteTeam,
-  addmember,
-  getAllMember,
-  deleteMember,
-  updateUser
+    getAllTeams,
+    getAllUser,
+    createUser,
+    deleteUser,
+    getUserPofile,
+    getTeam,
+    updateTeam,
+    deleteTeam,
+    addMember,
+    getAllMember,
+    deleteMember
 } from "../controllers/adminControl.js"
 import { registerWithFirebase } from '../controllers/firebaseauthControl.js';
 
@@ -52,7 +51,7 @@ router.delete('/teams/:teamID', authenticateUser, requireRole('admin'), deleteTe
 
 router.get('/members', getAllMember)
 
-router.post('/members', addmember)
+router.post('/members', authenticateUser, requireRole('admin'), addMember)
 
 router.delete('/members/:memberID', authenticateUser, requireRole('admin'), deleteMember);
 

@@ -4,12 +4,12 @@ import { User } from "../models/user.js";
 
 export const getTeamDetails = async (req, res) => {
   try {
-    const { teamId } = req.params;
+    const  teamId  = req.user.teamId;
 
     // Find team and populate members + leader
     const team = await Team.findById(teamId)
-      .populate("leaderId", "firstName lastName email phone college rollno eventProfile")
-      .populate("members", "firstName lastName email phone college rollno eventProfile");
+      .populate("leaderId", "firstName lastName email phone college rollno eventProfile.codeforcesId")
+      .populate("members", "firstName lastName email phone college rollno eventProfile.codeforcesId");
 
     if (!team) {
       return res.status(404).json({ message: "Team not found" });
