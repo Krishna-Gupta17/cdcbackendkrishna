@@ -12,7 +12,10 @@ import {
     deleteTeam,
     addMember,
     getAllMember,
-    deleteMember
+    deleteMember,
+    updateUser,
+    updateMember,
+    getMember
 } from "../controllers/adminControl.js"
 import { registerWithFirebase } from '../controllers/firebaseauthControl.js';
 
@@ -43,7 +46,7 @@ router.get('/teams', getAllTeams)
 
 router.get('/teams/:teamID', getTeam);
 
-router.put('/teams/:teamID', updateTeam);
+router.put('/teams/:teamId', updateTeam);
 
 router.delete('/teams/:teamID', authenticateUser, requireRole('admin'), deleteTeam);
 
@@ -51,8 +54,12 @@ router.delete('/teams/:teamID', authenticateUser, requireRole('admin'), deleteTe
 
 router.get('/members', getAllMember)
 
+router.get('/members/:memberId',protect,requireRole('admin'), getMember)
+
 router.post('/members', authenticateUser, requireRole('admin'), addMember)
 
 router.delete('/members/:memberID', authenticateUser, requireRole('admin'), deleteMember);
+
+router.put('/members/:memberID',protect,requireRole('admin'), updateMember);
 
 export default router;

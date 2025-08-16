@@ -35,6 +35,19 @@ export const getUserPofile = async (req, res) => {
   }
 };
 
+export const getMember = async (req, res) => {
+  try {
+    const member= await Member.findById(req.params.memberId).select('-password');
+    res.status(200).json({
+      success: true,
+      member
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+
 export const deleteUser = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.userID);
@@ -141,7 +154,7 @@ export const updateTeam = async (req, res) => {
     const updateData = flattenObject(req.body);
     console.log(updateData)
     const team = await Team.findByIdAndUpdate(
-      req.params.teamID,
+      req.params.teamId,
       { $set: updateData },
       { new: true, runValidators: true }
     );
@@ -241,8 +254,7 @@ export const deleteMember = async (req, res) => {
   try {
     const { memberID } = req.params;
     const member = await Member.findByIdAndDelete(memberID);
-
-
+    
     if (!member) {
       return res.status(404).json({ success: false, message: 'Member not found' });
     }
@@ -252,3 +264,18 @@ export const deleteMember = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+export const updateMember = async(req,res)=>{
+  try{
+    const memeber = await Member.findByIdAndUpdate(
+      req.params.memberID,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+    if (!memeber) return res.status(404).json({ success: false, message: 'member not found' });
+    res.status(200).json({ success: true,memeber});
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+
+}
