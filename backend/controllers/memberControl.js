@@ -111,17 +111,22 @@ export const getMember = async (req, res) => {
 };
 
 export const createBlog = async (req, res) => {
-  const email = req.user.email;
-  const memberemail = req.body.email;
-  console.log(email,memberemail)
-  if (memberemail !== email) {
-    return res.status(403).json({
-      success: false,
-      message: "Not your profile bro",
-    });
-  }
-  const { title, content, description, } = req.body
   try {
+    const email = req.user.email;
+    const member = await Member.findById(req.params.id).select('memberEmail');
+
+    if (!member) {
+      return res.status(404).json({ success: false, message: "Member not found" });
+    }
+
+    console.log(email, member.memberEmail)
+    if (member.memberEmail !== email) {
+      return res.status(403).json({
+        success: false,
+        message: "Not your profile bro",
+      });
+    }
+    const { title, content, description, } = req.body
 
     const blog = new Blog({
       title,
@@ -130,10 +135,11 @@ export const createBlog = async (req, res) => {
       author: req.params.id,
       isPublished: req.body.isPublished || false,
       publishedAt: new Date(),
+      authorName: member.memberName,
     });
 
-     const member =await  Member.findById(req.params.id)
-     blog.authorName = member.memberName;
+    //  const member =await  Member.findById(req.params.id)
+    //  blog.authorName = member.memberName;
     if (req.file) {
       const uploadResult = await uploadToCloudinary(req.file.buffer, {
         folder: 'blog/avatar',
@@ -165,7 +171,7 @@ export const getMemberBlogs = async (req, res) => {
     const memberid = req.params.id;
     const userid = req.user.id;
     if (userid !== memberid) {
-      const blogs = await Blog.find({ author: memberid, isPublished: true }).select('Title').sort({ publishedAt: -1 }) 
+      const blogs = await Blog.find({ author: memberid, isPublished: true }).select('Title').sort({ publishedAt: -1 })
     }
     else if (userid === memberid) {
       const blogs = await Blog.find({ author: memberid }).sort({ publishedAt: -1 });
