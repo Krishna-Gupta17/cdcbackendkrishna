@@ -25,13 +25,13 @@ router.put('/:id', upload.single('memberImage'), updateMember);
 router.get('/blog/:id', getBlog);
 
 // Create blog (protected)
-router.post('/:id', protect,upload.single('image'), createBlog);
+router.post('/blog', protect,upload.single('image'), createBlog);
 
 // Update blog (protected, ownership)
-router.put('/:id/:blogID', protect, blogownership, updateBlog);
+router.put('/blog/:id', protect, blogownership, updateBlog);
 
 // Delete blog (protected, ownership)
-router.delete('/:id/:blogID', protect, blogownership, deleteBlog);
+router.delete('/blog/:id', protect, blogownership, deleteBlog);
 
 export default router;
 
